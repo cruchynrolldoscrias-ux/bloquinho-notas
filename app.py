@@ -52,10 +52,20 @@ def carregar_notas():
                 with open(caminho, 'r', encoding='utf-8') as f:
                     nota = json.load(f)
                     nota['id'] = arquivo.replace('.json', '')
-                    # Garantir campos essenciais
-                    nota.setdefault('favorita', False)
+                    # GARANTIR QUE TODOS OS CAMPOS OBRIGATÓRIOS EXISTAM
+                    nota.setdefault('titulo', 'Sem título')
+                    nota.setdefault('conteudo', '')
+                    nota.setdefault('data_criacao', 'Data desconhecida')
+                    nota.setdefault('data_modificacao', nota.get('data_criacao', 'Data desconhecida'))
+                    nota.setdefault('categoria', '')
                     nota.setdefault('tags', [])
+                    nota.setdefault('favorita', False)
                     nota.setdefault('palavras', 0)
+                    nota.setdefault('nivel', '')
+                    nota.setdefault('metodologia', '')
+                    nota.setdefault('resultados', '')
+                    nota.setdefault('formulas', '')
+                    nota.setdefault('referencias', '')
                     notas.append(nota)
             except Exception as e:
                 print(f"Erro ao carregar nota {arquivo}: {e}")
@@ -67,17 +77,42 @@ def carregar_nota(nota_id):
     caminho = os.path.join(NOTAS_DIR, f"{nota_id}.json")
     if os.path.exists(caminho):
         with open(caminho, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            nota = json.load(f)
+            # Garantir campos obrigatórios
+            nota.setdefault('titulo', 'Sem título')
+            nota.setdefault('conteudo', '')
+            nota.setdefault('data_criacao', 'Data desconhecida')
+            nota.setdefault('data_modificacao', nota.get('data_criacao', 'Data desconhecida'))
+            nota.setdefault('categoria', '')
+            nota.setdefault('tags', [])
+            nota.setdefault('favorita', False)
+            nota.setdefault('palavras', 0)
+            nota.setdefault('nivel', '')
+            nota.setdefault('metodologia', '')
+            nota.setdefault('resultados', '')
+            nota.setdefault('formulas', '')
+            nota.setdefault('referencias', '')
+            return nota
     return None
 
 def atualizar_nota(nota_id, dados):
-    caminho = os.path.join(NOTAS_DIR, f"{nota_id}.json")
-    if os.path.exists(caminho):
+    caminho_antigo = os.path.join(NOTAS_DIR, f"{nota_id}.json")
+    
+    if os.path.exists(caminho_antigo):
+        # Carregar dados antigos para preservar o ID e data_criacao
+        with open(caminho_antigo, 'r', encoding='utf-8') as f:
+            dados_antigos = json.load(f)
+        
+        # Preservar dados que não mudam
+        dados['id'] = dados_antigos.get('id', nota_id)
+        dados['data_criacao'] = dados_antigos.get('data_criacao', 'Data desconhecida')
         dados['data_modificacao'] = datetime.now().strftime("%d/%m/%Y %H:%M")
         dados['palavras'] = contar_palavras(dados.get('conteudo', '')) + contar_palavras(dados.get('metodologia', ''))
         
-        with open(caminho, 'w', encoding='utf-8') as f:
+        # Salvar no MESMO arquivo (não mudar o nome)
+        with open(caminho_antigo, 'w', encoding='utf-8') as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
+        
         return True
     return False
 
@@ -160,6 +195,19 @@ def editar_nota(nota_id):
     if not nota:
         flash('Nota não encontrada!', 'error')
         return redirect(url_for('index'))
+    
+    # Calcular estatísticas para o template
+    conteudo = nota.get('conteudo', '')
+    if conteudo:
+        palavras_conteudo = len(conteudo.split())
+        tempo_leitura = max(0.1, round(palavras_conteudo / 200, 1))
+    else:
+        palavras_conteudo = 0
+        tempo_leitura = 0
+    
+    # Adicionar aos dados da nota
+    nota['palavras_conteudo'] = palavras_conteudo
+    nota['tempo_leitura'] = tempo_leitura
     
     if request.method == 'POST':
         try:

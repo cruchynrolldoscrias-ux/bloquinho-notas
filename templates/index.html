@@ -277,7 +277,7 @@
                     <div class="flex items-center space-x-4 text-xs text-scientific-500">
                         <div class="flex items-center">
                             <i class="fas fa-calendar mr-1.5"></i>
-                            <span>{{ nota.data_criacao.split(' ')[0] }}</span>
+                            <span>{{ nota.data_criacao.split(' ')[0] if nota.data_criacao and ' ' in nota.data_criacao else nota.data_criacao }}</span>
                         </div>
                         <div class="flex items-center">
                             <i class="fas fa-font mr-1.5"></i>

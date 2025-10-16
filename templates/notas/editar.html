@@ -80,11 +80,11 @@
                                     <div class="flex items-center space-x-4">
                                         <span class="flex items-center">
                                             <i class="fas fa-font mr-1"></i>
-                                            <span id="contador-palavras">{{ (nota.conteudo or '')|length > 0 ? (nota.conteudo.split(' ')|length) : 0 }} palavras</span>
+                                            <span id="contador-palavras">{{ nota.palavras_conteudo }} palavras</span>
                                         </span>
                                         <span class="flex items-center">
                                             <i class="fas fa-clock mr-1"></i>
-                                            <span id="tempo-leitura">{{ ((nota.conteudo or '')|length > 0 ? ((nota.conteudo.split(' ')|length / 200)|round(1)) : 0) }} min</span>
+                                            <span id="tempo-leitura">{{ nota.tempo_leitura }} min</span>
                                         </span>
                                     </div>
                                 </div>
@@ -250,6 +250,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     conteudoTextarea.addEventListener('input', atualizarContadores);
+    
+    // Inicializar contadores
+    atualizarContadores();
 });
 </script>
 {% endblock %}
