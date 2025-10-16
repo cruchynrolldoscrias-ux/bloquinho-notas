@@ -1,7 +1,7 @@
-# 🧪 Bloquinho da Bebeca
+# 🧪 Laboratório de Ideias Científicas
 
 Um aplicativo web interativo desenvolvido em **Flask** para **organizar anotações científicas**, metodologias, resultados e referências de pesquisa de forma prática, moderna e bonita.  
-Inspirado em um “laboratório digital de ideias”, o Bloquinho da Bebeca combina produtividade com um design acolhedor e elegante.
+o Laboratório de Ideias Científicas combina produtividade com um design acolhedor e elegante.
 
 ---
 
