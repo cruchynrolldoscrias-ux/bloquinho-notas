@@ -1,0 +1,286 @@
+/* Animations */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateX(100%); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+@keyframes bounceIn {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.3); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.05); 
+    }
+    70% { 
+        transform: scale(0.9); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 1; 
+    }
+    50% { 
+        opacity: 0.5; 
+    }
+}
+
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px); 
+    }
+    50% { 
+        transform: translateY(-10px); 
+    }
+}
+
+/* Component Styles */
+.sidebar {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.note-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.note-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(99, 102, 241, 0.1);
+}
+
+.note-card.favorita {
+    border-left: 4px solid #f59e0b;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    height: 6px;
+    border-radius: 3px;
+    transition: width 0.5s ease-in-out;
+}
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 2px;
+    transition: all 0.2s ease;
+}
+
+.category-badge:hover {
+    transform: scale(1.05);
+}
+
+/* Scientific Icons Colors */
+.icon-biochemistry { color: #10b981; }
+.icon-methodology { color: #3b82f6; }
+.icon-neuroscience { color: #8b5cf6; }
+.icon-genetics { color: #ef4444; }
+.icon-statistics { color: #f59e0b; }
+.icon-lab { color: #06b6d4; }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        z-index: 40;
+        height: 100vh;
+        overflow-y: auto;
+        width: 280px;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 30;
+    }
+    
+    .overlay.active {
+        display: block;
+    }
+    
+    .note-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Scrollbar Personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #3b82f6;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Markdown Content Styles */
+.markdown-content {
+    line-height: 1.7;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.markdown-content p {
+    margin-bottom: 1em;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+    margin-bottom: 1em;
+    padding-left: 2em;
+}
+
+.markdown-content code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9em;
+}
+
+.markdown-content pre {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 1em;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 1em;
+    margin-left: 0;
+    color: #64748b;
+    font-style: italic;
+}

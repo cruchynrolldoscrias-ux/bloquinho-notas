@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="ml-0 md:ml-80 min-h-screen bg-gradient-to-br from-scientific-50 via-white to-primary-50/30">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50 sticky top-0 z-10">
+        <div class="flex items-center justify-between p-6">
+            <div class="flex items-center">
+                <button onclick="history.back()" class="md:hidden text-scientific-600 hover:text-primary-600 mr-4 transition-colors duration-300 p-2 rounded-lg hover:bg-white">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-bold text-scientific-800">Nova Anotação Científica</h2>
+                    <p class="text-scientific-600 mt-1 flex items-center">
+                        <i class="fas fa-plus-circle mr-2 text-primary-500"></i>
+                        Crie uma nova anotação para sua pesquisa
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="{{ url_for('index') }}" class="bg-white border border-gray-300 rounded-2xl p-3 text-scientific-600 hover:text-primary-600 hover:border-primary-300 transition-all duration-300 shadow-sm hover:shadow-md flex items-center">
+                    <i class="fas fa-home mr-2"></i> Início
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo -->
+    <main class="p-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden">
+                <form method="POST" action="{{ url_for('criar_nota') }}" class="p-8">
+                    <!-- Cabeçalho do Formulário -->
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 class="text-2xl font-bold text-scientific-800">Detalhes da Anotação</h3>
+                            <p class="text-scientific-600 mt-2">Preencha os campos abaixo para criar uma nova anotação científica</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <a href="{{ url_for('index') }}" class="bg-white border border-gray-300 hover:bg-gray-50 text-scientific-700 py-3 px-6 rounded-2xl flex items-center transition-all duration-300">
+                                <i class="fas fa-times mr-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-3 px-8 rounded-2xl flex items-center shadow-lg transition-all duration-300 transform hover:scale-105">
+                                <i class="fas fa-save mr-2"></i> Salvar Anotação
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Coluna Principal -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <!-- Título -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                <label for="titulo" class="block text-sm font-semibold text-scientific-800 mb-3 flex items-center">
+                                    <i class="fas fa-heading mr-2 text-primary-500"></i>
+                                    Título da Anotação *
+                                </label>
+                                <input type="text" id="titulo" name="titulo" required
+                                       class="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-primary-500/30 focus:border-primary-500 text-lg font-semibold bg-gray-50/50 transition-all duration-300"
+                                       placeholder="Ex: Análise de Dados em Bioquímica com Espectrometria de Massa">
+                            </div>
+
+                            <!-- Conteúdo -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                <label for="conteudo" class="block text-sm font-semibold text-scientific-800 mb-3 flex items-center">
+                                    <i class="fas fa-file-alt mr-2 text-primary-500"></i>
+                                    Conteúdo da Anotação *
+                                </label>
+                                <textarea id="conteudo" name="conteudo" required rows="20"
+                                          class="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-primary-500/30 focus:border-primary-500 bg-gray-50/50 transition-all duration-300 resize-vertical"
+                                          placeholder="Comece a escrever sua anotação científica aqui...
+
+📚 Você pode adicionar:
+• Citações de artigos científicos
+• Referências bibliográficas  
+• Metodologias utilizadas
+• Resultados e discussões
+• Figuras e tabelas
+• Conclusões e perspectivas
+
+💡 Dica: Use markdown para formatação:
+**negrito**, *itálico*, `código`, listas, etc."></textarea>
+                                <div class="flex items-center justify-between mt-3 text-sm text-scientific-600">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-info-circle mr-2 text-primary-500"></i>
+                                        Suporte a Markdown habilitado
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <span class="flex items-center">
+                                            <i class="fas fa-font mr-1"></i>
+                                            <span id="contador-palavras">0 palavras</span>
+                                        </span>
+                                        <span class="flex items-center">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            <span id="tempo-leitura">0 min</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar de Metadados -->
+                        <div class="space-y-6">
+                            <!-- Informações Rápidas -->
+                            <div class="bg-gradient-to-br from-primary-50 to-blue-50 rounded-2xl p-6 border border-primary-200 shadow-sm">
+                                <h4 class="text-lg font-semibold text-scientific-800 mb-4 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-primary-600"></i>
+                                    Informações da Pesquisa
+                                </h4>
+                                
+                                <!-- Categoria -->
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-scientific-700 mb-2">Categoria</label>
+                                    <select name="categoria" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition-all duration-300">
+                                        <option value="">Selecione uma categoria</option>
+                                        {% for categoria in categorias %}
+                                        <option value="{{ categoria }}">{{ categoria }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Nível -->
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-scientific-700 mb-2">Nível</label>
+                                    <select name="nivel" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition-all duration-300">
+                                        <option value="Básico">Básico</option>
+                                        <option value="Intermediário">Intermediário</option>
+                                        <option value="Avançado">Avançado</option>
+                                    </select>
+                                </div>
+
+                                <!-- Tags -->
+                                <div class="mb-4">
+                                    <label for="tags" class="block text-sm font-medium text-scientific-700 mb-2">Tags</label>
+                                    <input type="text" id="tags" name="tags"
+                                           class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition-all duration-300"
+                                           placeholder="Ex: bioquímica, análise, espectrometria">
+                                    <p class="text-xs text-scientific-500 mt-1">Separadas por vírgula</p>
+                                </div>
+
+                                <!-- Favorita -->
+                                <div class="flex items-center p-3 bg-white rounded-xl border border-gray-300">
+                                    <input type="checkbox" id="favorita" name="favorita" 
+                                           class="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded transition-all duration-300">
+                                    <label for="favorita" class="ml-3 block text-sm font-medium text-scientific-700">
+                                        Marcar como favorita
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Metadados da Pesquisa -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                                <h4 class="text-lg font-semibold text-scientific-800 mb-4 flex items-center">
+                                    <i class="fas fa-microscope mr-2 text-primary-600"></i>
+                                    Metadados
+                                </h4>
+                                
+                                <div class="space-y-4">
+                                    <!-- Metodologia -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-scientific-700 mb-2">Metodologia</label>
+                                        <textarea name="metodologia" rows="3"
+                                                  class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50/50 transition-all duration-300 resize-vertical"
+                                                  placeholder="Métodos e procedimentos utilizados..."></textarea>
+                                    </div>
+
+                                    <!-- Resultados -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-scientific-700 mb-2">Resultados</label>
+                                        <textarea name="resultados" rows="3"
+                                                  class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50/50 transition-all duration-300 resize-vertical"
+                                                  placeholder="Principais resultados obtidos..."></textarea>
+                                    </div>
+
+                                    <!-- Fórmulas -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-scientific-700 mb-2">Fórmulas</label>
+                                        <textarea name="formulas" rows="2"
+                                                  class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50/50 transition-all duration-300 resize-vertical font-mono"
+                                                  placeholder="Fórmulas matemáticas ou químicas..."></textarea>
+                                    </div>
+
+                                    <!-- Referências -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-scientific-700 mb-2">Referências</label>
+                                        <textarea name="referencias" rows="3"
+                                                  class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50/50 transition-all duration-300 resize-vertical"
+                                                  placeholder="Referências bibliográficas importantes..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dicas Rápidas -->
+                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200 shadow-sm">
+                                <h4 class="text-lg font-semibold text-scientific-800 mb-3 flex items-center">
+                                    <i class="fas fa-lightbulb mr-2 text-green-600"></i>
+                                    Dicas para Pesquisa
+                                </h4>
+                                <ul class="space-y-2 text-sm text-scientific-600">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Seja específico no título</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Use tags relevantes</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Organize por categorias</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span>Documente metodologias</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação Inferiores -->
+                    <div class="flex justify-between items-center pt-8 mt-8 border-t border-gray-200">
+                        <div class="flex items-center text-sm text-scientific-500">
+                            <i class="fas fa-shield-alt mr-2 text-primary-500"></i>
+                            Suas anotações são salvas automaticamente
+                        </div>
+                        <div class="flex space-x-3">
+                            <button type="reset" class="bg-white border border-gray-300 hover:bg-gray-50 text-scientific-700 py-3 px-6 rounded-2xl flex items-center transition-all duration-300">
+                                <i class="fas fa-eraser mr-2"></i> Limpar
+                            </button>
+                            <button type="submit" class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-3 px-8 rounded-2xl flex items-center shadow-lg transition-all duration-300 transform hover:scale-105">
+                                <i class="fas fa-save mr-2"></i> Salvar Anotação
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const conteudoTextarea = document.getElementById('conteudo');
+    const contadorPalavras = document.getElementById('contador-palavras');
+    const tempoLeitura = document.getElementById('tempo-leitura');
+
+    function atualizarContadores() {
+        const texto = conteudoTextarea.value;
+        const palavras = texto.trim() ? texto.trim().split(/\s+/).length : 0;
+        const minutos = Math.ceil(palavras / 200); // 200 palavras por minuto
+        
+        contadorPalavras.textContent = `${palavras} palavras`;
+        tempoLeitura.textContent = `${minutos} min de leitura`;
+    }
+
+    conteudoTextarea.addEventListener('input', atualizarContadores);
+    atualizarContadores(); // Inicializar
+
+    // Foco automático no título
+    document.getElementById('titulo').focus();
+});
+</script>
+{% endblock %}

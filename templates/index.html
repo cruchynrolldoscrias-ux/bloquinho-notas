@@ -1,0 +1,709 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Overlay para mobile -->
+<div class="overlay"></div>
+
+<!-- Sidebar -->
+<div class="sidebar bg-gradient-to-b from-scientific-900 to-scientific-800 w-80 fixed h-full shadow-2xl z-20">
+    <div class="p-6 border-b border-scientific-700">
+        <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-microscope text-2xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Bloquinho da Bebeca</h1>
+                <p class="text-primary-200 text-sm mt-1">Laboratório de Ideias Científicas</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="p-6 flex-1 overflow-y-auto">
+        <!-- Botão Nova Anotação -->
+        <a href="{{ url_for('criar_nota') }}" class="group w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-4 px-6 rounded-2xl flex items-center justify-center shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl mb-8">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                <i class="fas fa-plus text-lg"></i>
+            </div>
+            <span class="font-bold text-lg">Nova Anotação</span>
+        </a>
+        
+        <!-- Estatísticas Rápidas -->
+        <div class="glass-effect rounded-2xl p-5 mb-8 border border-white/10">
+            <h3 class="text-sm font-semibold text-primary-200 mb-4 flex items-center">
+                <i class="fas fa-chart-line mr-3"></i> 
+                Dashboard Científico
+            </h3>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-primary-500/20 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-file-alt text-primary-300 text-sm"></i>
+                        </div>
+                        <span class="text-primary-100 text-sm">Total de Notas</span>
+                    </div>
+                    <span class="font-bold text-white text-lg">{{ notas|length }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-star text-yellow-300 text-sm"></i>
+                        </div>
+                        <span class="text-primary-100 text-sm">Favoritas</span>
+                    </div>
+                    <span class="font-bold text-white text-lg">{{ notas|selectattr('favorita')|list|length }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-font text-green-300 text-sm"></i>
+                        </div>
+                        <span class="text-primary-100 text-sm">Palavras</span>
+                    </div>
+                    <span class="font-bold text-white text-lg">{{ notas|sum(attribute='palavras') }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Categorias -->
+        <div class="mb-8">
+            <h2 class="text-sm font-semibold text-primary-300 uppercase tracking-wider mb-4 flex items-center">
+                <i class="fas fa-tags mr-3"></i> 
+                Categorias
+            </h2>
+            <ul class="space-y-2" id="categorias-list">
+                {% for categoria in categorias %}
+                <li>
+                    <a href="#" class="categoria-item group flex items-center px-4 py-3 text-primary-100 hover:bg-white/10 rounded-xl transition-all duration-200 border border-transparent hover:border-white/20">
+                        <div class="w-8 h-8 bg-primary-500/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-folder text-primary-300 text-sm"></i>
+                        </div>
+                        <span class="flex-1 font-medium">{{ categoria }}</span>
+                        <span class="bg-primary-500/30 text-primary-100 text-xs px-2 py-1 rounded-full font-semibold min-w-8 text-center">
+                            {{ notas|selectattr('categoria', 'equalto', categoria)|list|length }}
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+                <li>
+                    <button id="add-categoria-btn" class="group flex items-center px-4 py-3 text-primary-300 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200 w-full text-left border border-dashed border-white/20 hover:border-white/40">
+                        <div class="w-8 h-8 bg-primary-500/20 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-plus text-sm"></i>
+                        </div>
+                        <span class="font-medium">Nova Categoria</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Filtros -->
+        <div>
+            <h2 class="text-sm font-semibold text-primary-300 uppercase tracking-wider mb-4 flex items-center">
+                <i class="fas fa-filter mr-3"></i> 
+                Filtros
+            </h2>
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="filtro-item group flex items-center px-4 py-3 text-primary-100 hover:bg-yellow-500/20 rounded-xl transition-all duration-200" data-filtro="favoritas">
+                        <div class="w-8 h-8 bg-yellow-500/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-star text-yellow-300"></i>
+                        </div>
+                        <span class="font-medium">Favoritas</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="filtro-item group flex items-center px-4 py-3 text-primary-100 hover:bg-blue-500/20 rounded-xl transition-all duration-200" data-filtro="recentes">
+                        <div class="w-8 h-8 bg-blue-500/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-clock text-blue-300"></i>
+                        </div>
+                        <span class="font-medium">Recentes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="filtro-item group flex items-center px-4 py-3 text-primary-100 hover:bg-green-500/20 rounded-xl transition-all duration-200" data-filtro="sem-categoria">
+                        <div class="w-8 h-8 bg-green-500/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-tag text-green-300"></i>
+                        </div>
+                        <span class="font-medium">Sem Categoria</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer Sidebar -->
+    <div class="p-6 border-t border-scientific-700">
+        <div class="text-center text-primary-300 text-sm">
+            <p>🧪 Desenvolvido para minha bebeca</p>
+            <p class="text-xs mt-1">Marcelinho Research</p>
+        </div>
+    </div>
+</div>
+
+<!-- Conteúdo Principal -->
+<div class="ml-0 md:ml-80 min-h-screen bg-gradient-to-br from-scientific-50 via-white to-primary-50/30">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50 sticky top-0 z-10">
+        <div class="flex items-center justify-between p-6">
+            <div class="flex items-center">
+                <button id="menuToggle" class="md:hidden text-scientific-600 hover:text-primary-600 mr-4 transition-colors duration-300 p-2 rounded-lg hover:bg-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-bold text-scientific-800">Minhas Anotações Científicas</h2>
+                    <p class="text-scientific-600 mt-1 flex items-center">
+                        <i class="fas fa-flask mr-2 text-primary-500"></i>
+                        Organize suas pesquisas e descobertas
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative group">
+                    <input type="text" id="searchInput" placeholder="Buscar em anotações..." 
+                           class="pl-12 pr-6 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-3 focus:ring-primary-500/30 focus:border-primary-500 w-80 transition-all duration-300 bg-white/80 backdrop-blur-sm shadow-sm">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 group-focus-within:text-primary-500 transition-colors"></i>
+                    <div class="absolute right-3 top-3.5">
+                        <kbd class="px-2 py-1 text-xs text-gray-400 bg-gray-100 rounded-lg">⌘K</kbd>
+                    </div>
+                </div>
+                <button id="filterBtn" class="bg-white border border-gray-300 rounded-2xl p-3 text-scientific-600 hover:text-primary-600 hover:border-primary-300 transition-all duration-300 shadow-sm hover:shadow-md">
+                    <i class="fas fa-sliders-h text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo -->
+    <main class="p-6">
+        {% if notas %}
+        <!-- Header do Grid -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h3 class="text-xl font-bold text-scientific-800">Todas as Anotações</h3>
+                <p class="text-scientific-600">{{ notas|length }} anotações encontradas</p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2 bg-white rounded-2xl px-4 py-2 border border-gray-300 shadow-sm">
+                    <i class="fas fa-sort text-scientific-400"></i>
+                    <select class="bg-transparent border-none focus:outline-none text-scientific-700">
+                        <option>Mais Recentes</option>
+                        <option>Mais Antigas</option>
+                        <option>A-Z</option>
+                        <option>Z-A</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Anotações -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mb-8" id="notas-container">
+            {% for nota in notas %}
+            <div class="note-card rounded-3xl p-6 cursor-pointer transform transition-all duration-500 animate-fade-in {{ 'favorita border-l-4 border-yellow-400' if nota.favorita }}"
+                 data-nota-id="{{ nota.id }}"
+                 data-categoria="{{ nota.categoria or 'Sem Categoria' }}"
+                 data-favorita="{{ 'true' if nota.favorita else 'false' }}"
+                 data-data="{{ nota.data_criacao }}">
+                <!-- Header da Nota -->
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center mb-2">
+                            {% if nota.categoria %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 border border-primary-200 mr-2">
+                                <i class="fas fa-tag mr-1 text-xs"></i>
+                                {{ nota.categoria }}
+                            </span>
+                            {% endif %}
+                            {% if nota.favorita %}
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <i class="fas fa-star mr-1 text-xs"></i>
+                            </span>
+                            {% endif %}
+                        </div>
+                        <h3 class="font-bold text-scientific-800 text-lg mb-2 line-clamp-2 leading-tight">{{ nota.titulo or 'Sem título' }}</h3>
+                    </div>
+                    <div class="flex space-x-1 ml-3 flex-shrink-0">
+                        <button class="favorito-btn p-2 rounded-xl transition-all duration-200 {{ 'text-yellow-500 bg-yellow-50 shadow-sm' if nota.favorita else 'text-scientific-400 hover:text-yellow-500 hover:bg-yellow-50' }}"
+                                data-nota-id="{{ nota.id }}"
+                                title="{{ 'Remover dos favoritos' if nota.favorita else 'Adicionar aos favoritos' }}">
+                            <i class="{{ 'fas' if nota.favorita else 'far' }} fa-star"></i>
+                        </button>
+                        <div class="relative">
+                            <button class="options-btn p-2 rounded-xl text-scientific-400 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="options-menu absolute right-0 mt-1 w-48 bg-white rounded-2xl shadow-2xl border border-gray-200 py-2 z-10 hidden animate-fade-in">
+                                <a href="{{ url_for('editar_nota', nota_id=nota.id) }}" 
+                                   class="flex items-center px-4 py-3 text-sm text-scientific-700 hover:bg-primary-50 hover:text-primary-700 transition-colors duration-200">
+                                    <i class="fas fa-edit mr-3 text-primary-500"></i> 
+                                    Editar
+                                </a>
+                                <a href="{{ url_for('ver_nota', nota_id=nota.id) }}" 
+                                   class="flex items-center px-4 py-3 text-sm text-scientific-700 hover:bg-primary-50 hover:text-primary-700 transition-colors duration-200">
+                                    <i class="fas fa-eye mr-3 text-blue-500"></i> 
+                                    Visualizar
+                                </a>
+                                <div class="border-t border-gray-200 my-1"></div>
+                                <button class="deletar-btn flex items-center w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                                        data-nota-id="{{ nota.id }}">
+                                    <i class="fas fa-trash mr-3"></i> 
+                                    Deletar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Conteúdo Preview -->
+                <div class="mb-4">
+                    <p class="text-scientific-600 text-sm leading-relaxed line-clamp-3">
+                        {{ nota.conteudo[:120] or 'Nenhum conteúdo ainda...' }}{% if nota.conteudo|length > 120 %}...{% endif %}
+                    </p>
+                </div>
+                
+                <!-- Tags -->
+                {% if nota.tags and nota.tags|length > 0 %}
+                <div class="mb-4 flex flex-wrap gap-1">
+                    {% for tag in nota.tags %}
+                        {% if tag and tag.strip() %}
+                        <span class="tag bg-scientific-100 text-scientific-700 border border-scientific-200 text-xs">
+                            <i class="fas fa-hashtag mr-1"></i>{{ tag.strip() }}
+                        </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Metadados -->
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200/50">
+                    <div class="flex items-center space-x-4 text-xs text-scientific-500">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar mr-1.5"></i>
+                            <span>{{ nota.data_criacao.split(' ')[0] }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-font mr-1.5"></i>
+                            <span>{{ nota.palavras }} palavras</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        {% if nota.nivel %}
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                                    {% if nota.nivel == 'Avançado' %}bg-red-100 text-red-800
+                                    {% elif nota.nivel == 'Intermediário' %}bg-orange-100 text-orange-800
+                                    {% else %}bg-green-100 text-green-800{% endif %}">
+                            {{ nota.nivel }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <!-- Estado Vazio -->
+        <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-32 h-32 bg-gradient-to-br from-primary-100 to-primary-200 rounded-3xl flex items-center justify-center mb-8 animate-float">
+                <i class="fas fa-microscope text-4xl text-primary-600"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-scientific-800 mb-4">Bem-vinda ao seu laboratório de ideias! 🧪</h3>
+            <p class="text-scientific-600 text-lg mb-8 max-w-md">
+                Comece organizando suas pesquisas científicas criando sua primeira anotação.
+            </p>
+            <a href="{{ url_for('criar_nota') }}" class="group bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-4 px-8 rounded-2xl flex items-center justify-center shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-plus text-lg"></i>
+                </div>
+                <span class="font-bold text-lg">Criar Primeira Anotação</span>
+            </a>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl">
+                <div class="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-book text-blue-600"></i>
+                    </div>
+                    <h4 class="font-semibold text-scientific-800 mb-2">Organize Referências</h4>
+                    <p class="text-scientific-600 text-sm">Mantenha todas suas fontes organizadas</p>
+                </div>
+                <div class="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-flask text-green-600"></i>
+                    </div>
+                    <h4 class="font-semibold text-scientific-800 mb-2">Metodologias</h4>
+                    <p class="text-scientific-600 text-sm">Registre procedimentos e métodos</p>
+                </div>
+                <div class="text-center p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-purple-600"></i>
+                    </div>
+                    <h4 class="font-semibold text-scientific-800 mb-2">Resultados</h4>
+                    <p class="text-scientific-600 text-sm">Analise e documente descobertas</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+</div>
+
+<!-- Modal de Confirmação -->
+<div id="confirmModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 animate-fade-in">
+    <div class="bg-white rounded-3xl p-8 max-w-md mx-4 shadow-2xl transform transition-all duration-300 animate-bounce-in">
+        <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+        </div>
+        <h3 class="text-xl font-bold text-scientific-800 text-center mb-2">Confirmar Exclusão</h3>
+        <p class="text-scientific-600 text-center mb-6">Tem certeza que deseja deletar esta anotação? Esta ação não pode ser desfeita.</p>
+        <div class="flex justify-center space-x-4">
+            <button id="cancelDelete" class="px-6 py-3 text-scientific-600 hover:text-scientific-800 font-medium rounded-xl transition-colors duration-200">
+                Cancelar
+            </button>
+            <button id="confirmDelete" class="px-6 py-3 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-all duration-200 transform hover:scale-105">
+                <i class="fas fa-trash mr-2"></i>Deletar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center hidden z-50">
+    <div class="text-center">
+        <div class="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-scientific-600 font-medium">Processando...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Estado da aplicação
+    const appState = {
+        notaParaDeletar: null,
+        filtroAtivo: 'todas',
+        buscaAtiva: '',
+        ordenacao: 'recentes'
+    };
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        inicializarEventListeners();
+        carregarEstatisticas();
+    });
+
+    function inicializarEventListeners() {
+        // Menu mobile
+        document.getElementById('menuToggle').addEventListener('click', toggleMenuMobile);
+        document.querySelector('.overlay').addEventListener('click', toggleMenuMobile);
+
+        // Opções das notas
+        document.querySelectorAll('.options-btn').forEach(btn => {
+            btn.addEventListener('click', toggleOptionsMenu);
+        });
+
+        // Fechar menus ao clicar fora
+        document.addEventListener('click', fecharMenus);
+
+        // Favoritos
+        document.querySelectorAll('.favorito-btn').forEach(btn => {
+            btn.addEventListener('click', toggleFavorito);
+        });
+
+        // Filtros
+        document.querySelectorAll('.filtro-item').forEach(item => {
+            item.addEventListener('click', aplicarFiltro);
+        });
+
+        // Categorias
+        document.querySelectorAll('.categoria-item').forEach(item => {
+            item.addEventListener('click', filtrarPorCategoria);
+        });
+
+        // Busca
+        document.getElementById('searchInput').addEventListener('input', realizarBusca);
+
+        // Modal de confirmação
+        document.querySelectorAll('.deletar-btn').forEach(btn => {
+            btn.addEventListener('click', abrirModalConfirmacao);
+        });
+
+        document.getElementById('cancelDelete').addEventListener('click', fecharModalConfirmacao);
+        document.getElementById('confirmDelete').addEventListener('click', confirmarDelecao);
+
+        // Nova categoria
+        document.getElementById('add-categoria-btn').addEventListener('click', adicionarCategoria);
+
+        // Flash messages
+        document.querySelectorAll('.flash-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.flash-message').style.opacity = '0';
+                setTimeout(() => {
+                    this.closest('.flash-message').remove();
+                }, 300);
+            });
+        });
+
+        // Auto-hide flash messages após 5 segundos
+        setTimeout(() => {
+            document.querySelectorAll('.flash-message').forEach(msg => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+    }
+
+    function toggleMenuMobile() {
+        document.querySelector('.sidebar').classList.toggle('active');
+        document.querySelector('.overlay').classList.toggle('active');
+        document.body.classList.toggle('overflow-hidden');
+    }
+
+    function toggleOptionsMenu(e) {
+        e.stopPropagation();
+        const menu = this.nextElementSibling;
+        const todosMenus = document.querySelectorAll('.options-menu');
+        
+        todosMenus.forEach(m => {
+            if (m !== menu) m.classList.add('hidden');
+        });
+        
+        menu.classList.toggle('hidden');
+    }
+
+    function fecharMenus() {
+        document.querySelectorAll('.options-menu').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+    }
+
+    function toggleFavorito(e) {
+        e.stopPropagation();
+        const notaId = this.dataset.notaId;
+        const icon = this.querySelector('i');
+        
+        // Animação visual imediata
+        this.classList.toggle('text-yellow-500');
+        this.classList.toggle('bg-yellow-50');
+        this.classList.toggle('text-scientific-400');
+        this.classList.toggle('bg-transparent');
+        
+        icon.classList.toggle('fas');
+        icon.classList.toggle('far');
+        
+        // Atualizar no servidor
+        fetch(`/nota/favorito/${notaId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                // Reverter se houve erro
+                this.classList.toggle('text-yellow-500');
+                this.classList.toggle('bg-yellow-50');
+                this.classList.toggle('text-scientific-400');
+                this.classList.toggle('bg-transparent');
+                icon.classList.toggle('fas');
+                icon.classList.toggle('far');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            // Reverter em caso de erro
+            this.classList.toggle('text-yellow-500');
+            this.classList.toggle('bg-yellow-50');
+            this.classList.toggle('text-scientific-400');
+            this.classList.toggle('bg-transparent');
+            icon.classList.toggle('fas');
+            icon.classList.toggle('far');
+        });
+    }
+
+    function aplicarFiltro(e) {
+        e.preventDefault();
+        const filtro = this.dataset.filtro;
+        appState.filtroAtivo = filtro;
+        
+        // Atualizar UI
+        document.querySelectorAll('.filtro-item').forEach(item => {
+            item.classList.remove('bg-primary-500/30', 'text-white');
+        });
+        this.classList.add('bg-primary-500/30', 'text-white');
+        
+        aplicarFiltrosEBusca();
+    }
+
+    function filtrarPorCategoria(e) {
+        e.preventDefault();
+        const categoria = this.dataset.categoria || this.querySelector('span').textContent;
+        appState.filtroAtivo = categoria;
+        
+        // Atualizar UI
+        document.querySelectorAll('.categoria-item').forEach(item => {
+            item.classList.remove('bg-primary-500/30', 'text-white');
+        });
+        this.classList.add('bg-primary-500/30', 'text-white');
+        
+        aplicarFiltrosEBusca();
+    }
+
+    function realizarBusca(e) {
+        appState.buscaAtiva = e.target.value.toLowerCase();
+        aplicarFiltrosEBusca();
+    }
+
+    function aplicarFiltrosEBusca() {
+        const notas = document.querySelectorAll('.note-card');
+        let notasVisiveis = 0;
+        
+        notas.forEach(nota => {
+            const titulo = nota.querySelector('h3').textContent.toLowerCase();
+            const conteudo = nota.querySelector('p').textContent.toLowerCase();
+            const tags = Array.from(nota.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
+            const categoria = nota.dataset.categoria.toLowerCase();
+            const favorita = nota.dataset.favorita === 'true';
+            
+            let deveMostrar = true;
+            
+            // Aplicar filtro
+            if (appState.filtroAtivo === 'favoritas' && !favorita) {
+                deveMostrar = false;
+            } else if (appState.filtroAtivo === 'sem-categoria' && categoria !== 'sem categoria') {
+                deveMostrar = false;
+            } else if (appState.filtroAtivo !== 'todas' && appState.filtroAtivo !== 'favoritas' && appState.filtroAtivo !== 'recentes' && appState.filtroAtivo !== 'sem-categoria') {
+                if (categoria !== appState.filtroAtivo.toLowerCase()) {
+                    deveMostrar = false;
+                }
+            }
+            
+            // Aplicar busca
+            if (deveMostrar && appState.buscaAtiva) {
+                const buscaMatch = titulo.includes(appState.buscaAtiva) || 
+                                 conteudo.includes(appState.buscaAtiva) ||
+                                 tags.some(tag => tag.includes(appState.buscaAtiva)) ||
+                                 categoria.includes(appState.buscaAtiva);
+                deveMostrar = buscaMatch;
+            }
+            
+            if (deveMostrar) {
+                nota.style.display = 'block';
+                notasVisiveis++;
+                // Animação de entrada
+                nota.style.animation = 'fadeIn 0.5s ease-out';
+            } else {
+                nota.style.display = 'none';
+            }
+        });
+        
+        // Atualizar contador
+        const contador = document.querySelector('main h3 + p');
+        if (contador) {
+            contador.textContent = `${notasVisiveis} anotações encontradas`;
+        }
+    }
+
+    function abrirModalConfirmacao(e) {
+        e.stopPropagation();
+        appState.notaParaDeletar = this.dataset.notaId;
+        document.getElementById('confirmModal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function fecharModalConfirmacao() {
+        document.getElementById('confirmModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        appState.notaParaDeletar = null;
+    }
+
+    function confirmarDelecao() {
+        if (!appState.notaParaDeletar) return;
+        
+        mostrarLoading();
+        
+        fetch(`/nota/deletar/${appState.notaParaDeletar}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            esconderLoading();
+            if (data.success) {
+                fecharModalConfirmacao();
+                // Recarregar a página para refletir as mudanças
+                window.location.reload();
+            } else {
+                alert('Erro ao deletar nota: ' + data.message);
+            }
+        })
+        .catch(error => {
+            esconderLoading();
+            console.error('Erro:', error);
+            alert('Erro ao deletar nota');
+        });
+    }
+
+    function adicionarCategoria() {
+        const categoria = prompt('Digite o nome da nova categoria:');
+        if (categoria && categoria.trim()) {
+            mostrarLoading();
+            
+            fetch('/api/categorias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ categoria: categoria.trim() })
+            })
+            .then(response => response.json())
+            .then(data => {
+                esconderLoading();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Erro ao adicionar categoria');
+                }
+            })
+            .catch(error => {
+                esconderLoading();
+                console.error('Erro:', error);
+                alert('Erro ao adicionar categoria');
+            });
+        }
+    }
+
+    function carregarEstatisticas() {
+        fetch('/api/estatisticas')
+            .then(response => response.json())
+            .then(data => {
+                // Atualizar estatísticas na sidebar se necessário
+                console.log('Estatísticas carregadas:', data);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar estatísticas:', error);
+            });
+    }
+
+    function mostrarLoading() {
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+    }
+
+    function esconderLoading() {
+        document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    // Atalhos de teclado
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+K ou Cmd+K para focar na busca
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+        
+        // Escape para fechar modais e menus
+        if (e.key === 'Escape') {
+            fecharModalConfirmacao();
+            fecharMenus();
+        }
+    });
+</script>
+{% endblock %}

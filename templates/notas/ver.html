@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}{{ nota.titulo }} - Bloquinho da Bebeca{% endblock %}
+
+{% block content %}
+<div class="ml-0 md:ml-80 min-h-screen bg-gradient-to-br from-scientific-50 via-white to-primary-50/30">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-200/50 sticky top-0 z-10">
+        <div class="flex items-center justify-between p-6">
+            <div class="flex items-center">
+                <button onclick="history.back()" class="md:hidden text-scientific-600 hover:text-primary-600 mr-4 transition-colors duration-300 p-2 rounded-lg hover:bg-white">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-bold text-scientific-800">Visualizando Anotação</h2>
+                    <p class="text-scientific-600 mt-1 flex items-center">
+                        <i class="fas fa-eye mr-2 text-primary-500"></i>
+                        Detalhes completos da pesquisa
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="window.print()" class="bg-white border border-gray-300 rounded-2xl p-3 text-scientific-600 hover:text-primary-600 hover:border-primary-300 transition-all duration-300 shadow-sm hover:shadow-md flex items-center">
+                    <i class="fas fa-print mr-2"></i> Imprimir
+                </button>
+                <a href="{{ url_for('editar_nota', nota_id=nota.id) }}" class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-3 px-6 rounded-2xl flex items-center shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-edit mr-2"></i> Editar
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo -->
+    <main class="p-6">
+        <div class="max-w-6xl mx-auto">
+            <!-- Cabeçalho da Nota -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 p-8 mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="flex-1">
+                        <!-- Badges -->
+                        <div class="flex flex-wrap items-center gap-3 mb-4">
+                            {% if nota.categoria %}
+                            <span class="inline-flex items-center px-4 py-2 rounded-2xl text-sm font-semibold bg-primary-100 text-primary-800 border border-primary-200">
+                                <i class="fas fa-tag mr-2 text-xs"></i>
+                                {{ nota.categoria }}
+                            </span>
+                            {% endif %}
+                            {% if nota.favorita %}
+                            <span class="inline-flex items-center px-4 py-2 rounded-2xl text-sm font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                <i class="fas fa-star mr-2 text-xs"></i>
+                                Favorita
+                            </span>
+                            {% endif %}
+                            {% if nota.nivel %}
+                            <span class="inline-flex items-center px-4 py-2 rounded-2xl text-sm font-semibold 
+                                        {% if nota.nivel == 'Avançado' %}bg-red-100 text-red-800 border-red-200
+                                        {% elif nota.nivel == 'Intermediário' %}bg-orange-100 text-orange-800 border-orange-200
+                                        {% else %}bg-green-100 text-green-800 border-green-200{% endif %}">
+                                <i class="fas fa-chart-line mr-2 text-xs"></i>
+                                {{ nota.nivel }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Título -->
+                        <h1 class="text-4xl font-bold text-scientific-800 mb-4 leading-tight">{{ nota.titulo or 'Sem título' }}</h1>
+
+                        <!-- Metadados -->
+                        <div class="flex flex-wrap items-center gap-6 text-sm text-scientific-600">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-calendar text-blue-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-scientific-800">Criada em</div>
+                                    <div>{{ nota.data_criacao }}</div>
+                                </div>
+                            </div>
+                            {% if nota.data_modificacao and nota.data_modificacao != nota.data_criacao %}
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-edit text-green-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-scientific-800">Modificada em</div>
+                                    <div>{{ nota.data_modificacao }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-font text-purple-600 text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-scientific-800">Palavras</div>
+                                    <div>{{ nota.palavras }} (~{{ (nota.palavras / 200)|round|int }} min de leitura)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                {% if nota.tags and nota.tags|length > 0 %}
+                <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
+                    {% for tag in nota.tags %}
+                        {% if tag and tag.strip() %}
+                        <span class="inline-flex items-center px-3 py-2 rounded-xl text-sm bg-scientific-100 text-scientific-800 border border-scientific-200 font-medium">
+                            <i class="fas fa-hashtag mr-1 text-xs text-scientific-600"></i>{{ tag.strip() }}
+                        </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Grid de Conteúdo -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Conteúdo Principal -->
+                <div class="lg:col-span-3">
+                    <!-- Metadados da Pesquisa -->
+                    {% if nota.metodologia or nota.resultados or nota.formulas or nota.referencias %}
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 p-8 mb-6">
+                        <h3 class="text-2xl font-bold text-scientific-800 mb-6 flex items-center">
+                            <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center mr-4">
+                                <i class="fas fa-microscope text-primary-600"></i>
+                            </div>
+                            Metadados da Pesquisa
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% if nota.metodologia %}
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                                <h4 class="font-semibold text-scientific-800 mb-3 flex items-center">
+                                    <i class="fas fa-flask mr-2 text-blue-600"></i>
+                                    Metodologia
+                                </h4>
+                                <p class="text-scientific-700 leading-relaxed">{{ nota.metodologia }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if nota.resultados %}
+                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
+                                <h4 class="font-semibold text-scientific-800 mb-3 flex items-center">
+                                    <i class="fas fa-chart-line mr-2 text-green-600"></i>
+                                    Resultados
+                                </h4>
+                                <p class="text-scientific-700 leading-relaxed">{{ nota.resultados }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if nota.formulas %}
+                            <div class="bg-gradient-to-br from-purple-50 to-fuchsia-50 rounded-2xl p-6 border border-purple-200">
+                                <h4 class="font-semibold text-scientific-800 mb-3 flex items-center">
+                                    <i class="fas fa-square-root-alt mr-2 text-purple-600"></i>
+                                    Fórmulas
+                                </h4>
+                                <div class="bg-white/80 rounded-xl p-4 font-mono text-scientific-800 border border-purple-200">
+                                    {{ nota.formulas }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if nota.referencias %}
+                            <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-200">
+                                <h4 class="font-semibold text-scientific-800 mb-3 flex items-center">
+                                    <i class="fas fa-book mr-2 text-orange-600"></i>
+                                    Referências
+                                </h4>
+                                <p class="text-scientific-700 leading-relaxed">{{ nota.referencias }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Conteúdo Principal -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-scientific-800 flex items-center">
+                                <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center mr-4">
+                                    <i class="fas fa-file-alt text-primary-600"></i>
+                                </div>
+                                Conteúdo
+                            </h3>
+                            <div class="flex items-center space-x-2 text-sm text-scientific-500">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ (nota.palavras / 200)|round|int }} min de leitura</span>
+                            </div>
+                        </div>
+
+                        <div class="prose prose-lg max-w-none markdown-content">
+                            {% if nota.conteudo_html %}
+                                {{ nota.conteudo_html|safe }}
+                            {% else %}
+                                <div class="text-scientific-700 leading-relaxed whitespace-pre-line text-lg">
+                                    {{ nota.conteudo or 'Nenhum conteúdo disponível.' }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Ações Rápidas -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 p-6">
+                        <h4 class="text-lg font-semibold text-scientific-800 mb-4 flex items-center">
+                            <i class="fas fa-bolt mr-2 text-yellow-500"></i>
+                            Ações Rápidas
+                        </h4>
+                        <div class="space-y-3">
+                            <a href="{{ url_for('editar_nota', nota_id=nota.id) }}" 
+                               class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white py-3 px-4 rounded-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-105">
+                                <i class="fas fa-edit mr-2"></i> Editar
+                            </a>
+                            <a href="{{ url_for('index') }}" 
+                               class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-scientific-700 py-3 px-4 rounded-2xl flex items-center justify-center transition-all duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i> Voltar
+                            </a>
+                            <button onclick="window.print()" 
+                                    class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-scientific-700 py-3 px-4 rounded-2xl flex items-center justify-center transition-all duration-300">
+                                <i class="fas fa-print mr-2"></i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Informações Técnicas -->
+                    <div class="bg-gradient-to-br from-scientific-50 to-scientific-100 rounded-3xl shadow-xl border border-scientific-200 p-6">
+                        <h4 class="text-lg font-semibold text-scientific-800 mb-4 flex items-center">
+                            <i class="fas fa-info-circle mr-2 text-scientific-600"></i>
+                            Informações Técnicas
+                        </h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-scientific-600">ID:</span>
+                                <span class="font-mono text-scientific-800 text-xs">{{ nota.id }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-scientific-600">Status:</span>
+                                <span class="font-semibold {% if nota.favorita %}text-yellow-600{% else %}text-scientific-800{% endif %}">
+                                    {% if nota.favorita %}⭐ Favorita{% else %}📄 Normal{% endif %}
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-scientific-600">Categoria:</span>
+                                <span class="font-semibold text-scientific-800">{{ nota.categoria or 'Sem categoria' }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-scientific-600">Nível:</span>
+                                <span class="font-semibold text-scientific-800">{{ nota.nivel or 'Não definido' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dicas de Pesquisa -->
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl shadow-xl border border-green-200 p-6">
+                        <h4 class="text-lg font-semibold text-scientific-800 mb-3 flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-green-600"></i>
+                            Dicas
+                        </h4>
+                        <ul class="space-y-2 text-sm text-scientific-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>
+                                <span>Revise periodicamente</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>
+                                <span>Atualize referências</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>
+                                <span>Mantenha tags atualizadas</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rodapé -->
+            <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                <a href="{{ url_for('index') }}" class="inline-flex items-center text-scientific-600 hover:text-scientific-900 transition-colors duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar para a lista
+                </a>
+                <div class="text-sm text-scientific-500">
+                    <i class="fas fa-shield-alt mr-2 text-primary-500"></i>
+                    Anotação protegida e armazenada com segurança
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.markdown-content {
+    line-height: 1.8;
+    font-size: 1.125rem;
+    color: #374151;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
+    margin-top: 2em;
+    margin-bottom: 1em;
+    font-weight: 700;
+    color: #1f2937;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5em;
+}
+
+.markdown-content h1 {
+    font-size: 2.25rem;
+    border-bottom-width: 3px;
+    border-color: #3b82f6;
+}
+
+.markdown-content h2 {
+    font-size: 1.875rem;
+}
+
+.markdown-content h3 {
+    font-size: 1.5rem;
+}
+
+.markdown-content p {
+    margin-bottom: 1.5em;
+    line-height: 1.8;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+    margin-bottom: 1.5em;
+    padding-left: 2em;
+}
+
+.markdown-content li {
+    margin-bottom: 0.75em;
+    line-height: 1.7;
+}
+
+.markdown-content code {
+    background: #f3f4f6;
+    padding: 0.25em 0.5em;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Consolas', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    color: #dc2626;
+    border: 1px solid #e5e7eb;
+}
+
+.markdown-content pre {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 1.5em;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+    border: 1px solid #374151;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.markdown-content pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    border: none;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 1.5em;
+    margin-left: 0;
+    color: #6b7280;
+    font-style: italic;
+    background: #f8fafc;
+    padding: 1.5em;
+    border-radius: 0 12px 12px 0;
+    margin: 1.5em 0;
+}
+
+.markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #e5e7eb;
+    padding: 1em;
+    text-align: left;
+}
+
+.markdown-content th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+}
+
+.markdown-content tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.markdown-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 1.5em 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+</style>
+{% endblock %}
