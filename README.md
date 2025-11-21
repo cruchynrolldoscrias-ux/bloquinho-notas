@@ -37,5 +37,5 @@ o Laboratório de Ideias Científicas combina produtividade com um design acolhe
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/seu-usuario/bloquinho-notas.git
+git clone https://github.com/RyanMarcelinos/bloquinho-notas.git
 cd bloquinho-notas
